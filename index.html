@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume | Malika Tandon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chosen Palette: Warm Neutrals (Background: #F5F5F5, Primary Text: #333333, Accent: #8D6E63, Chart Colors: #A1887F, #BDBDBD, #795548, #D7CCC8) -->
+    <!-- Application Structure Plan: The SPA is designed as a personal portfolio dashboard. The structure is thematic, starting with a powerful summary (Hero Section), followed by interactive sections for Core Competencies (Chart + Details), Career Journey (Interactive Timeline), and ending with Education & Certifications. This non-linear, interactive structure was chosen to allow recruiters to quickly grasp key qualifications and then dive into areas of specific interest, which is more engaging than a linear resume and highlights data-driven and product strategy skills effectively. -->
+    <!-- Visualization & Content Choices: 
+        - Summary -> Goal: Inform/Impress -> Method: Prominent text block -> Interaction: None -> Justification: Immediately establishes expertise and brand.
+        - Core Competencies -> Goal: Compare/Inform -> Method: Interactive Doughnut Chart (Chart.js) and Text Blocks -> Interaction: Hovering over chart segments highlights the corresponding skill description, clicking filters the view. -> Justification: Visually represents the blend of skills and provides an engaging way to explore technical and strategic capabilities.
+        - Work Experience -> Goal: Change/Organize -> Method: Vertical Timeline (HTML/CSS/JS) -> Interaction: Clicking on a job title expands to show detailed accomplishments. -> Justification: Effectively shows career progression and impact over time in a structured, digestible format.
+        - Certifications -> Goal: Inform -> Method: Grid Layout (HTML/Tailwind) -> Interaction: None -> Justification: Clear, scannable presentation of credentials.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #F5F5F5;
+            font-family: 'Inter', sans-serif;
+            color: #333333;
+        }
+        .timeline-item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .timeline-item.active .timeline-item-content {
+            max-height: 500px; /* Adjust as needed */
+            transition: max-height 0.7s ease-in;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- Header/Hero Section -->
+        <header class="text-center py-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Malika Tandon</h1>
+            <p class="mt-2 text-xl text-gray-600">Strategic Product Leader</p>
+            <div class="mt-4 flex justify-center items-center space-x-6 text-gray-500">
+                <span class="flex items-center"><i class="fas fa-phone mr-2"></i> 7905047366</span>
+                <span class="flex items-center"><i class="fas fa-envelope mr-2"></i> tandonmallika1398@gmail.com</span>
+                <a href="https://linkedin.com/in/malika-tandon" target="_blank" class="flex items-center hover:text-[#8D6E63] transition-colors"><i class="fab fa-linkedin mr-2"></i> LinkedIn</a>
+            </div>
+            <p class="mt-6 max-w-3xl mx-auto text-lg text-gray-700 bg-white/60 p-6 rounded-xl shadow-sm">
+                Strategic Product Leader with 5+ years of global experience driving large-scale enterprise solutions. Proven ability to translate complex business goals into data-driven product roadmaps and deliver robust technical success. Expert in managing technical & design decisions, supporting the ML development lifecycle, and influencing diverse stakeholders without direct authority to scale critical infrastructure and data platforms.
+            </p>
+        </header>
+
+        <main>
+            <!-- Core Competencies Section -->
+            <section id="competencies" class="py-16 bg-white rounded-2xl shadow-lg">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">Core Competencies</h2>
+                    <p class="mt-2 text-gray-600">A blend of strategic, technical, and leadership skills. Hover over the chart or click titles to explore.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center px-6">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <div id="skills-details" class="space-y-4">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Career Journey Section -->
+            <section id="experience" class="py-16 mt-16">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">Career Journey</h2>
+                    <p class="mt-2 text-gray-600">Click on each role to view key accomplishments and impact.</p>
+                </div>
+                <div id="timeline-container" class="relative max-w-4xl mx-auto">
+                     <!-- Vertical line -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gray-300"></div>
+                     <!-- JS will populate timeline items here -->
+                </div>
+            </section>
+            
+            <!-- Certifications & Education Section -->
+            <section id="education" class="py-16 bg-white rounded-2xl shadow-lg mt-16">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">Education & Certifications</h2>
+                    <p class="mt-2 text-gray-600">Foundations of knowledge and continuous learning.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 px-6">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-center text-[#795548]">Education</h3>
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-inner text-center">
+                            <p class="text-lg font-bold">B.Tech, Computer Science and Technology</p>
+                            <p class="text-md text-gray-600">Shri Ramswaroop Memorial College</p>
+                            <p class="text-sm text-gray-500">2016 - 2020</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-center text-[#795548]">Certifications</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-inner text-center">AI Product Management (Duke)</div>
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-inner text-center">Star Performer (Amazon)</div>
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-inner text-center">Android Dev Distinction (IIT Kanpur)</div>
+                            <div class="bg-gray-50 p-4 rounded-lg shadow-inner text-center">Azure Fundamentals (Microsoft)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center py-8 mt-8 text-gray-500">
+            <p>&copy; 2025 Malika Tandon. Interactive Resume created with passion.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const skillsData = [
+                {
+                    label: 'Product Strategy & Roadmap',
+                    description: 'Defining vision and creating actionable roadmaps for large-scale systems, guiding investment and platform capabilities.',
+                    icon: 'fa-map-signs'
+                },
+                {
+                    label: 'Data-Driven Decision Making',
+                    description: 'Utilizing advanced analytics (SQL, Python) and A/B testing to transform large-scale data into actionable insights and drive ROI.',
+                    icon: 'fa-chart-line'
+                },
+                {
+                    label: 'Technical & Infrastructure Acumen',
+                    description: 'Leading technical/design discussions, understanding solution architecture, and enhancing infrastructure reliability.',
+                    icon: 'fa-cogs'
+                },
+                {
+                    label: 'Stakeholder Influence & Leadership',
+                    description: 'Leading cross-functional teams and influencing diverse stakeholders without direct authority to secure buy-in and drive initiatives.',
+                    icon: 'fa-users'
+                },
+                {
+                    label: 'ML Lifecycle & Agile Methods',
+                    description: 'Supporting the ML development lifecycle from requirements to impact analysis, utilizing Agile/Scrum methodologies for efficient execution.',
+                    icon: 'fa-project-diagram'
+                }
+            ];
+
+            const skillsDetailsContainer = document.getElementById('skills-details');
+            skillsData.forEach((skill, index) => {
+                const detailEl = document.createElement('div');
+                detailEl.id = `skill-detail-${index}`;
+                detailEl.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors skill-card';
+                detailEl.innerHTML = `
+                    <h4 class="font-bold text-lg text-gray-800 flex items-center"><i class="fas ${skill.icon} mr-3 text-[#8D6E63]"></i>${skill.label}</h4>
+                    <p class="text-gray-600 mt-1">${skill.description}</p>
+                `;
+                skillsDetailsContainer.appendChild(detailEl);
+            });
+            
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const skillsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: skillsData.map(s => s.label),
+                    datasets: [{
+                        data: [25, 25, 20, 20, 10], // Relative weights
+                        backgroundColor: ['#8D6E63', '#A1887F', '#BDBDBD', '#D7CCC8', '#795548'],
+                        borderColor: '#F5F5F5',
+                        borderWidth: 4,
+                        hoverBorderWidth: 6,
+                        hoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}`;
+                                }
+                            }
+                        }
+                    },
+                    onHover: (event, chartElement) => {
+                        const cards = document.querySelectorAll('.skill-card');
+                        cards.forEach(card => {
+                            card.style.transform = 'scale(1)';
+                            card.style.boxShadow = 'none';
+                        });
+                        if(chartElement.length) {
+                           const index = chartElement[0].index;
+                           const activeCard = document.getElementById(`skill-detail-${index}`);
+                           activeCard.style.transform = 'scale(1.05)';
+                           activeCard.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+                        }
+                    }
+                }
+            });
+
+            const experienceData = [
+                {
+                    role: 'Product Manager',
+                    company: 'Razorpay',
+                    date: 'Aug 2024 - Present',
+                    icon: 'fa-rocket',
+                    details: [
+                        'Improved merchant onboarding satisfaction by 25% on a large-scale platform through data-driven user journey analysis and targeted product enhancements.',
+                        'Reduced engineering rework by 30% by translating complex features into clear, engineering-ready technical specifications and detailed design requirements.',
+                        'Cut system downtime by 15% by proactively identifying and resolving root causes for infrastructure performance alerts.',
+                        'Led the end-to-end launch of two critical payment infrastructure features, exceeding initial adoption goals by 15%.',
+                        'Designed and executed rigorous A/B tests to optimize UX, boosting feature ROI by 50%.'
+                    ]
+                },
+                {
+                    role: 'Product Analyst',
+                    company: 'Signzy',
+                    date: '1.4 years',
+                    icon: 'fa-chart-pie',
+                    details: [
+                        'Led complex APAC merchant platform launches, managing day-to-day technical and design decisions to ensure seamless integration with core backend infrastructure.',
+                        'Identified critical user pain points and emerging market trends to inform strategic product feature development for digital identity verification systems.',
+                        'Analyzed intricate client challenges to develop innovative, data-driven technical solutions that enhanced core platform functionality and contributed to ML model requirements.',
+                        'Articulated compelling technical value propositions, influencing diverse stakeholder groups to secure buy-in for strategic platform initiatives.',
+                        'Led Proof-of-Concepts (POCs) for complex technical integrations, analyzing performance data and user feedback to guide system enhancements within the ML development lifecycle.'
+                    ]
+                },
+                 {
+                    role: 'Solution Specialist',
+                    company: 'Twilio',
+                    date: '2 years',
+                    icon: 'fa-lightbulb',
+                    details: [
+                        'Analyzed complex prospect needs and business processes for Fortune 50 companies, extracting requirements for large-scale communication solutions.',
+                        'Provided deep technical qualification and developed targeted product demonstrations for API-driven communication channels.',
+                        'Articulated quantifiable ROI of communication features through in-depth demonstrations and tailored Proof of Concepts (POCs).',
+                        'Led end-to-end bid management for enterprise solutions, translating complex prospect needs into clear product requirements and technical integration specifications.'
+                    ]
+                }
+            ];
+
+            const timelineContainer = document.getElementById('timeline-container');
+            experienceData.forEach((job, index) => {
+                const alignment = index % 2 === 0 ? 'left' : 'right';
+                const timelineItem = document.createElement('div');
+                timelineItem.className = `timeline-item mb-8 flex justify-between items-center w-full ${alignment === 'left' ? 'flex-row-reverse' : ''}`;
+                timelineItem.innerHTML = `
+                    <div class="order-1 w-5/12"></div>
+                    <div class="z-20 flex items-center order-1 bg-[#8D6E63] shadow-xl w-12 h-12 rounded-full">
+                        <h1 class="mx-auto text-white text-xl"><i class="fas ${job.icon}"></i></h1>
+                    </div>
+                    <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4 cursor-pointer hover:shadow-2xl transition-shadow">
+                        <h3 class="font-bold text-gray-800 text-xl">${job.role}</h3>
+                        <p class="text-sm font-medium text-[#795548]">${job.company}</p>
+                        <p class="text-sm text-gray-500 mb-3">${job.date}</p>
+                        <div class="timeline-item-content">
+                            <ul class="list-disc list-inside space-y-2 mt-2 text-gray-600">
+                                ${job.details.map(d => `<li>${d}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                timelineContainer.appendChild(timelineItem);
+            });
+
+            document.querySelectorAll('.timeline-item .bg-white').forEach(item => {
+                item.addEventListener('click', () => {
+                    const parent = item.closest('.timeline-item');
+                    parent.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
